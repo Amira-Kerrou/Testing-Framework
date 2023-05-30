@@ -1,0 +1,5 @@
+"Hub-URL": "http://localhost:4444"
+"Stark-URL": "http://192.168.1.203:9002/login"
+"emailUser": "akerrou@spark-it.fr"
+"passwordUser": "Azerty123**"
+"browser": "REMOTE_CHROME"

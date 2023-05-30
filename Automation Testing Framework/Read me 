@@ -1,0 +1,9 @@
+Le 11/05/2023 : modifiée
+
+framework avec :
+Allure Capture en cas de fail
+pages : main
+tasks : Common steps + screenshot
+Read data of new collaborator and URL of the hub from Data json file
+Combine baseSuiteSetup and grid config in BaseSetup
++ page factory modifications

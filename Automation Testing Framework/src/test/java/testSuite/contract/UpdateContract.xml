@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd">
+<suite name="Testing Stark using Selenium" parallel="tests"  thread-count="3">
+    <test name="Data attributes test1">
+        <parameter name="browser" value="REMOTE_CHROME"/>
+        <parameter name="timeOut" value="180000"/>
+        <classes>
+            <class name="Contract.HRspace.Stark.UpdateContract"/>
+        </classes>
+
+    </test> <!-- Test -->
+</suite>
