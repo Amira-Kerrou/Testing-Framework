@@ -1,233 +1,28 @@
-def LIST_PARENT = []
-def LIST_CHILD = []
-def LIST_TEST = []
-def TEST_INPUT
-def CHILD_INPUT
-def PARENT_INPUT
-def TEST_SELECTED_FINAL = []
-def PARENT_SELECTED_FINAL = []
-def CHILD_SELECTED_FINAL = []
-def COMMAND_FINAL = []
-def CMD ='
-
-pipeline { 
-
-stages {
-        stage('Delete Workspace') {
-            steps {
-                cleanWs deleteDirs: true
-                checkout scm
-            }
-        }
-stage('Data Upload') {
-                steps {
-                    dir("$WORKDIR") {
-                    timeout(60) { 
-                        script {
-                        FAILED_STAGE = env.STAGE_NAME
-                        def fb64 = input message: 'Upload DATA Config', parameters: [base64File('appProperties.yml')]
-                        sh "echo ${BUILD_NUMBER} "
-                        withEnv(["fb64=$fb64"]) {
-                            sh ' truncate -s 0 src/main/resources/appProperties.yaml'
-                            sh 'echo $fb64 | base64 -d >> src/main/resources/appProperties.yaml'
-                            sh 'cat  src/main/resources/appProperties.yaml'
-                        }
-
-                       }                                                 
-                    }
-                }
-             }
-        } 
-        
-        stage('Suite Parent selection') {
-            steps {
-                 dir("$WORKDIR") {
-                timeout(60) { 
-                    script {
-                        FAILED_STAGE = env.STAGE_NAME
-                        def listParam = [booleanParam(name: "All",defaultValue:true)] 
-                        LIST_PARENT  =sh(returnStdout: true, script: " cd ${WORKSPACE} && ls *.xml | cut  -d '.' -f1").trim().split('\n')                       
-
-                        for (test_name in LIST_PARENT){
-                            listParam.add(booleanParam(name: "$test_name",defaultValue:false))
-                        }                                             
-                         PARENT_INPUT = input id: 'test' , message: 'List OF Parent Suite', ok: 'Proceed', parameters:listParam, submitterParameter: 'APPROVER' 
-
-                        // FETCH PARENT SELECTED
-                        int i = 0;
-                        for (parent_name in LIST_PARENT){
-                            if  (i>0)
-                            {
-                                break;
-                            }
-                            for (parent_selected in PARENT_INPUT){
-                                if ("All=true" == "$parent_selected")
-                                { 
-                                    for (name in LIST_PARENT){
-                                         PARENT_SELECTED_FINAL.add("$name")                                       
-                                    }
-                                    i++
-                                    break;                              
-                                }
-                                if ("$parent_name=true" == "$parent_selected")
-                                {
-                                    PARENT_SELECTED_FINAL.add("$parent_name")                    
-                                }
-                             } 
-                         } 
-                       }                                                 
-                    }
-                }
-            }
-        }
-
-         stage('Suite child selection') {
-            steps {
-                 dir("$WORKDIR") {
-                timeout(60) { 
-                    script {
-                        FAILED_STAGE = env.STAGE_NAME
-                        for (parent_name in PARENT_SELECTED_FINAL){
-                            def listParam = [booleanParam(name: "All",defaultValue:true)] 
-                            LIST_CHILD  =sh(returnStdout: true, script: "cat ${WORKSPACE}/$parent_name'.xml' | grep 'suite-file path' | cut -d'\"' -f2 | cut -d '/' -f2 | cut  -d '.' -f1").trim().split('\n')          
-
-                            for (child_name in LIST_CHILD){
-                                listParam.add(booleanParam(name: "$child_name",defaultValue:false))
-                            }                                             
-                            CHILD_INPUT = input id: 'test' , message: "List Of Suite Child For $parent_name", ok: 'Proceed', parameters:listParam, submitterParameter: 'APPROVER'
-                            
-                            // FETCH CHILD SELECTED
-                            int i = 0;
-                            for (child_name in LIST_CHILD){
-                                if  (i>0)
-                                {
-                                  break;
-                                }
-                                for (child_selected in CHILD_INPUT){
-
-                                    if ("All=true" == "$child_selected")
-                                     {
-                                        for (name in LIST_CHILD){
-                                         CHILD_SELECTED_FINAL.add("$name")
-                                       
-                                        } 
-                                        i++
-                                        break;
-                                    }
-                                    if ("$child_name=true" == "$child_selected")
-                                    {
-                                        CHILD_SELECTED_FINAL.add("$child_name")                    
-                                    }
-                                } 
-                              } 
-                           }
-                       }                                                 
-                    }
-                }
-            }
-        }
-
+pipeline {
+    agent any
     
-        stage('Test Selection') {
+    stages {
+        stage('git repo & clean') {
             steps {
-             dir("$WORKDIR") {
-                timeout(60) {  
-                    script {
-                        FAILED_STAGE = env.STAGE_NAME
-                        for (child_name in CHILD_SELECTED_FINAL){
-                        def listParam = [booleanParam(name: "All",defaultValue:true)] 
-                        LIST_TEST  =sh(returnStdout: true, script: "cat ${WORKSPACE}/sub-suites/$child_name'.xml' | grep 'test name' | cut -d'\"' -f2").trim().split('\n')                         
-
-                         for (test_name in LIST_TEST){
-                            listParam.add(booleanParam(name: "$test_name",defaultValue:false))
-                        }                                             
-                         TEST_INPUT = input id: 'test' , message: "List OF Tests for $child_name", ok: 'Proceed', parameters:listParam, submitterParameter: 'APPROVER'     
-
-                        // FETCH TEST SELECTED
-                                int i = 0;
-                                for (test_name in LIST_TEST){
-                                    if  (i>0)
-                                    {
-                                    break;
-                                    }
-                                    for (test_selected in TEST_INPUT){
-
-                                        if ("All=true" == "$test_selected")
-                                        {
-                                            for (name in LIST_TEST){
-                                            TEST_SELECTED_FINAL.add("$name")
-                                            } 
-                                            i++
-                                            break;
-                                        }
-                                        if ("$test_name=true" == "$test_selected")
-                                        {
-                                            TEST_SELECTED_FINAL.add("$test_name")                    
-                                        }
-                                     } 
-                                 } 
-                                 def command_test=TEST_SELECTED_FINAL.join(',')
-                                 CMD="mvn clean test -f $WORKDIR/pom.xml -Djsuite=$child_name -fn -Dtest='$command_test' -Dallure.results.directory='target/allure-results/$child_name' -e "
-                                 COMMAND_FINAL.add("$CMD")
-                                 TEST_SELECTED_FINAL=[]                                                                                  
-                       }
-                    }
-                }         
-           }
-        }  
-    }
-  stage('Stage Test') {
-            agent {
-                docker {
-                    image 'maven-3.8.4-jdk-11-google-chrome'
-                    args '-u root -v $HOME/.m2:/root/.m2'
-                    reuseNode true
-                }
+                sh 'rm -rf Testing-Framework'
+                sh 'git clone https://github.com/Amira-Kerrou/Testing-Framework.git'
+                sh 'mvn clean -f Testing-Framework/pom.xml'
             }
- stage('send report to allure server') {
+        }
+        stage('install') {
             steps {
-                dir("$WORKDIR") {
-                    script {
-                        FAILED_STAGE = env.STAGE_NAME
-                        sh 'echo send report to allure'
-
-                        for (child_suite in CHILD_SELECTED_FINAL){
-                            sh """
-                            mkdir -p target/allure-results/$child_suite
-                            mkdir -p  $child_suite && \
-                            unzip $child_suite'.zip' -d $child_suite && \
-                            cp -f $child_suite/* target/allure-results/$child_suite/                   
-                            """                        
-                        }
-                        sh "zip -9 -r Export.zip target/allure-results/* "                        
-                                               
-                        archiveArtifacts artifacts: 'Export.zip', followSymlinks: false, onlyIfSuccessful: true
-                        allure([
-                            includeProperties: false,
-                            jdk: '',
-                            properties: [],
-                            reportBuildPolicy: 'ALWAYS',
-                            results: [[path: 'target/allure-results/']]                       
-                        ])   
-                                          
-                   }
-                }
+                sh 'mvn install -f Testing-Framework/pom.xml'
             }
-        } 
-
-    }
-post {
-        failure {
-        script {
-              mail to: "${EMAIL_INFORM}", subject:"Build failure: ${JOB_NAME}" , body: "Your build is failed for the job ${JOB_NAME} in the stage ${FAILED_STAGE}, please correct it"
-			   }
-    }
-		
-		always {
-            cleanWs()
+        }
+        stage('test') {
+            steps {
+                sh 'mvn test -f Testing-Framework/pom.xml'
+            }
+        }
+        stage('package') {
+            steps {
+                sh 'mvn package -f Testing-Framework/pom.xml'
+            }
         }
     }
-
 }
-
-
