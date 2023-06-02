@@ -16,7 +16,7 @@ pipeline {
         }
         stage('test') {
             steps {
-                sh 'mvn test -f Testing-Framework/pom.xml'
+                sh 'mvn test -f Testing-Framework/pom.xml -Djsuite=TestngStarkLogin.xml'
             }
         }
         stage('package') {
