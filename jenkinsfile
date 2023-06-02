@@ -1,6 +1,6 @@
 pipeline {
     agent any
-    
+
     stages {
         stage('git repo & clean') {
             steps {
@@ -22,6 +22,17 @@ pipeline {
         stage('package') {
             steps {
                 sh 'mvn package -f Testing-Framework/pom.xml'
+            }
+        }
+        stage('Allure Report') {
+            steps {
+                allure([
+                    includeProperties: false,
+                    jdk: '',
+                    properties: [],
+                    reportBuildPolicy: 'ALWAYS',
+                    results: [[path: 'Testing-Framework/target/allure-results']]
+                ])
             }
         }
     }
