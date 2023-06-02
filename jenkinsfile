@@ -20,9 +20,10 @@ pipeline {
             }
         }
         stage('package') {
-            steps {
-                sh 'mvn package -f Testing-Framework/pom.xml'
-            }
+            steps {
+                sh 'mvn package -f Testing-Framework/pom.xml'
+            }
+        }
         stage('Allure Report') {
             steps {
                 allure([
