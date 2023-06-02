@@ -1,6 +1,8 @@
 pipeline {
     agent any
- stage('Delete Workspace') {
+    
+    stages {
+        stage('Delete Workspace') {
             steps {
                 cleanWs deleteDirs: true
                 checkout scm
@@ -12,11 +14,13 @@ pipeline {
                 sh 'mvn install -f Testing-Framework/pom.xml'
             }
         }
+        
         stage('test') {
             steps {
                 sh 'mvn test -f Testing-Framework/pom.xml -Djsuite=TestngStarkLogin.xml'
             }
         }
+        
         stage('Allure Report') {
             steps {
                 allure([
@@ -29,4 +33,4 @@ pipeline {
             }
         }
     }
-
+}
