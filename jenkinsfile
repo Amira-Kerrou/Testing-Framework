@@ -10,7 +10,7 @@ pipeline {
         }
         stage('install') {
             steps {
-                dir('Testing-Framework') {
+                dir('workspace/Automation-Testing-Framework/Testing-Framework/Automation Testing Framework/src/test/java/testSuite/collaborators') {
                     sh 'mvn clean install'
                 }
             }
