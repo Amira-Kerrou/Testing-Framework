@@ -6,24 +6,27 @@ pipeline {
             steps {
                 sh 'rm -rf Testing-Framework'
                 sh 'git clone https://github.com/Amira-Kerrou/Testing-Framework.git'
-                sh 'mvn clean -f Testing-Framework/pom.xml'
             }
         }
         stage('install') {
             steps {
                 dir('Testing-Framework') {
-                    sh 'mvn install'
+                    sh 'mvn clean install'
                 }
             }
         }
         stage('test') {
             steps {
-                sh "mvn clean test -f Testing-Framework/pom.xml -Dtest=AddDeleteDataPF -Dallure.results.directory=Testing-Framework/Automation Testing Framework/allure-results"
+                dir('Testing-Framework') {
+                    sh "mvn test -Dtest=AddDeleteDataPF -Dallure.results.directory=Automation Testing Framework/allure-results"
+                }
             }
         }
         stage('package') {
             steps {
-                sh 'mvn package -f Testing-Framework/pom.xml'
+                dir('Testing-Framework') {
+                    sh 'mvn package'
+                }
             }
         }
         stage('Allure Report') {
