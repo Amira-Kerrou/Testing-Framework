@@ -1,14 +1,12 @@
 pipeline {
     agent any
-
-    stages {
-        stage('git repo & clean') {
+ stage('Delete Workspace') {
             steps {
-                sh 'rm -rf Testing-Framework'
-                sh 'git clone https://github.com/Amira-Kerrou/Testing-Framework.git'
-                sh 'mvn clean -f Testing-Framework/pom.xml'
+                cleanWs deleteDirs: true
+                checkout scm
             }
         }
+
         stage('install') {
             steps {
                 sh 'mvn install -f Testing-Framework/pom.xml'
@@ -31,4 +29,4 @@ pipeline {
             }
         }
     }
-}
+
