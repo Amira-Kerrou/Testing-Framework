@@ -16,7 +16,7 @@ pipeline {
         }
         stage('test') {
             steps {
-                sh 'mvn test -f Testing-Framework/pom.xml'
+                sh "mvn clean test -f Testing-Framework/pom.xml -Dtest=AddDeleteDataPF -Dallure.results.directory=Testing-Framework/Automation Testing Framework/allure-results"
             }
         }
         stage('package') {
