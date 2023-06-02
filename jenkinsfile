@@ -18,7 +18,7 @@ pipeline {
         stage('test') {
             steps {
                 dir('Testing-Framework') {
-                    sh "mvn test -Dtest=AddDeleteDataPF -Dallure.results.directory=Automation Testing Framework/allure-results"
+                    sh "mvn test -Dtest=AddDeleteDataPF -Dallure.results.directory='Automation Testing Framework/allure-results'"
                 }
             }
         }
