@@ -19,7 +19,6 @@ pipeline {
                 sh 'mvn test -f Testing-Framework/pom.xml -Djsuite=TestngStarkLogin.xml'
             }
         }
-
         stage('Allure Report') {
             steps {
                 allure([
