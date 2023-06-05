@@ -10,7 +10,7 @@ pipeline {
         }
         stage('install') {
             steps {
-               dir('~/workspace/Automation-Testing-Framework/Automation Testing Framework') {
+               dir('/var/jenkins_home/workspace/Automation-Testing-Framework') {
                     sh 'mvn clean install'
                 }
             }
