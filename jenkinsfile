@@ -10,7 +10,7 @@ pipeline {
         }
         stage('install') {
             steps {
-                dir('var/jenkins-home/workspace/Automation-Testing-Framework/pom.xml') {
+                dir('var/jenkins-home/workspace/Automation-Testing-Framework') {
                     sh 'mvn clean install'
                 }
             }
