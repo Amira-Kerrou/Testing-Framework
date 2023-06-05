@@ -8,20 +8,6 @@ pipeline {
                 sh 'git clone https://github.com/Amira-Kerrou/Testing-Framework.git'
             }
         }
-        stage('test') {
-            steps {
-                dir('Testing-Framework') {
-                    sh "mvn test -Dtest=AddDeleteDataPF -Dallure.results.directory='Automation Testing Framework/allure-results'"
-                }
-            }
-        }
-        stage('package') {
-            steps {
-                dir('Testing-Framework') {
-                    sh 'mvn package'
-                }
-            }
-        }
         stage('Allure Report') {
             steps {
                 allure([
