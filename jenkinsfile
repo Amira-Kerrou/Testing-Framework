@@ -10,7 +10,7 @@ pipeline {
         }
         stage('install') {
             steps {
-                dir('workspace/Automation-Testing-Framework/Testing-Framework/Automation Testing Framework/src/test/java/testSuite/collaborators') {
+                dir('var/jenkins-home/workspace/Automation-Testing-Framework/testSuite/testng.xml) {
                     sh 'mvn clean install'
                 }
             }
