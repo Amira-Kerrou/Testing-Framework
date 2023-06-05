@@ -10,7 +10,7 @@ pipeline {
         }
         stage('install') {
             steps {
-                dir('Automation-Testing-Framework') {
+               dir('~/workspace/Automation-Testing-Framework/Automation Testing Framework') {
                     sh 'mvn clean install'
                 }
             }
