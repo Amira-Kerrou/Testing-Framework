@@ -8,13 +8,6 @@ pipeline {
                 sh 'git clone https://github.com/Amira-Kerrou/Testing-Framework.git'
             }
         }
-        stage('install') {
-            steps {
-                dir('/var/jenkins_home/workspace/Automation-Testing-Framework') {
-                    sh 'mvn clean install'
-                }
-            }
-        }
         stage('test') {
             steps {
                 dir('Testing-Framework') {
