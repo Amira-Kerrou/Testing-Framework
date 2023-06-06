@@ -17,6 +17,7 @@ pipeline {
         stage('test') {
             steps {
                 sh 'mvn test -f Testing-Framework/pom.xml'
+                sh 'mvn clean test -f workspace/Automation-Testing-Framework/Testing-Framework/pom.xml -Djsuite=$child_name -fn -Dtest='AddDelete' -Dallure.results.directory='Testing-Framework/Automation Testing Framework/target/allure-results/$child_name' -e'
             }
         }
         stage('package') {
