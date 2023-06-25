@@ -5,6 +5,8 @@ pipeline {
         stage('git repo & clean') {
             steps {
                 sh 'rm -rf Testing-Framework'
+                sh 'git clone https://github.com/Amira-Kerrou/Testing-Framework.git'
+                sh 'mvn clean -f Testing-Framework/pom.xml'
             }
         }
         stage('install') {
@@ -14,6 +16,7 @@ pipeline {
         }
         stage('test') {
             steps {
+                sh 'mvn test -f Testing-Framework/pom.xml -Djsuite=TestngStarkLogin.xml'
             }
         }
         stage('Allure Report') {
